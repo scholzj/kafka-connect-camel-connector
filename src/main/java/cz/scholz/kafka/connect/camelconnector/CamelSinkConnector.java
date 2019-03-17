@@ -5,6 +5,7 @@
 package cz.scholz.kafka.connect.camelconnector;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class CamelSinkConnector extends SinkConnector {
     private static final ConfigDef CONFIG_DEF = new ConfigDef()
         .define(COMPONENT_CONFIG, Type.STRING, Importance.HIGH, "Name of the Apache Camel component which will be used to route messages. (component://address?option1=value1&options2=value2)")
         .define(ADDRESS_CONFIG, Type.STRING, Importance.HIGH, "The address which will be used to configure the component. (component://address?option1=value1&options2=value2)")
-        .define(OPTIONS_CONFIG, Type.LIST, Importance.HIGH, "List of options for configuring the component. The list should contain key-value pairs. E.g. `[\"option1=key1\", \"option2=key2\"]`.");
+        .define(OPTIONS_CONFIG, Type.LIST, Collections.EMPTY_LIST, Importance.HIGH, "List of options for configuring the component. The list should contain key-value pairs. E.g. `[\"option1=key1\", \"option2=key2\"]`.");
 
     private String component;
     private String address;
