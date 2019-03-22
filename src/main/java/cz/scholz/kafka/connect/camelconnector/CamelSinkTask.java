@@ -18,12 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * CamelSinkTask log records using Logger
+ * CamelSinkTask sends records to Camel
  */
 public class CamelSinkTask extends SinkTask {
     private static final Logger log = LoggerFactory.getLogger(CamelSinkTask.class);
 
+    private String taskName;
     private CamelContext camel;
+    private String localUrl;
     private ProducerTemplate producer;
 
     @Override
@@ -34,13 +36,18 @@ public class CamelSinkTask extends SinkTask {
     @Override
     public void start(Map<String, String> props) {
         try {
+            taskName = props.get(CamelSinkConnector.NAME_CONFIG);
+            log.info("Starting connector task {}", taskName);
+
             camel = new DefaultCamelContext();
 
-            String camelUrl = props.get(CamelSinkConnector.COMPONENT_CONFIG) + "://" + props.get(CamelSinkConnector.ADDRESS_CONFIG) + "?" + props.get(CamelSinkConnector.OPTIONS_CONFIG);
+            localUrl = "direct:" + taskName;
+            String remoteUrl = props.get(CamelSinkConnector.COMPONENT_CONFIG) + "://" + props.get(CamelSinkConnector.ADDRESS_CONFIG) + "?" + props.get(CamelSinkConnector.OPTIONS_CONFIG);
 
+            log.info("Creating Camel route from({}).to({})", localUrl, remoteUrl);
             camel.addRoutes(new RouteBuilder() {
                 public void configure() {
-                    from("direct:sink-task").to(camelUrl);
+                    from(localUrl).to(remoteUrl);
                 }
             });
 
@@ -55,7 +62,7 @@ public class CamelSinkTask extends SinkTask {
     @Override
     public void put(Collection<SinkRecord> sinkRecords) {
         for (SinkRecord record : sinkRecords) {
-            producer.sendBodyAndHeader("direct:sink-task", record.value(), "header", record.key());
+            producer.sendBodyAndHeader(localUrl, record.value(), "header", record.key());
         }
     }
 
