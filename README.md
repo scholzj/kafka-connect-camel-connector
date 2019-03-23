@@ -15,7 +15,7 @@ Currently, only the Sink connector exists.
 
 For example the examples used above would create a following Apache Camel endpoint: `file:///tmp/output-files?autoCreate=true&charset=utf-8`.
 
-## Examples
+## Sink Examples
 
 * Copy the `camel-connector-0.0.1-SNAPSHOT.jar` jar file and Apache Camel to your Kafka Connect plugin directory
 * Create a connector instance Kafka Connect REST API:
