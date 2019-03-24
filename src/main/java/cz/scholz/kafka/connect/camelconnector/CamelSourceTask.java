@@ -43,14 +43,14 @@ public class CamelSourceTask extends SourceTask {
     @Override
     public void start(Map<String, String> props) {
         try {
-            taskName = props.get(CamelSinkConnector.NAME_CONFIG);
-            topic = props.get(CamelSinkConnector.TOPICS_CONFIG);
+            taskName = props.get(CamelSourceConnector.NAME_CONFIG);
+            topic = props.get(CamelSourceConnector.TOPIC_CONFIG);
             log.info("Starting connector task {}", taskName);
 
             camel = new DefaultCamelContext();
 
             localUrl = "direct:" + taskName;
-            String remoteUrl = props.get(CamelSinkConnector.COMPONENT_CONFIG) + "://" + props.get(CamelSinkConnector.ADDRESS_CONFIG) + "?" + props.get(CamelSinkConnector.OPTIONS_CONFIG);
+            String remoteUrl = props.get(CamelSourceConnector.COMPONENT_CONFIG) + "://" + props.get(CamelSourceConnector.ADDRESS_CONFIG) + "?" + props.get(CamelSourceConnector.OPTIONS_CONFIG);
 
             log.info("Creating Camel route from({}).to({})", remoteUrl, localUrl);
             camel.addRoutes(new RouteBuilder() {
@@ -68,14 +68,19 @@ public class CamelSourceTask extends SourceTask {
     }
 
     @Override
-    public List<SourceRecord> poll() throws InterruptedException {
+    public List<SourceRecord> poll() {
         List<SourceRecord> records = new ArrayList<>();
 
         while (true)    {
             Exchange ex = consumer.receiveNoWait(localUrl);
 
             if (ex != null) {
-                Map<String, Object> sourcePartition = Collections.singletonMap("filename", ex.getFromEndpoint());
+                log.info("Received exchange with");
+                log.info("\t from endpoint: {}", ex.getFromEndpoint());
+                log.info("\t exchange id: {}", ex.getExchangeId());
+                log.info("\t message id: {}", ex.getMessage().getMessageId());
+                log.info("\t message body: {}", ex.getMessage().getBody());
+                Map<String, Object> sourcePartition = Collections.singletonMap("filename", ex.getFromEndpoint().toString());
                 Map<String, Object> sourceOffset = Collections.singletonMap("position", ex.getExchangeId());
                 SourceRecord record = new SourceRecord(sourcePartition, sourceOffset, topic, Schema.BYTES_SCHEMA, ex.getMessage().getBody());
                 records.add(record);

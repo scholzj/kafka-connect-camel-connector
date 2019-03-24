@@ -33,7 +33,7 @@ public class CamelSourceConnector extends SourceConnector {
         .define(COMPONENT_CONFIG, Type.STRING, Importance.HIGH, "Name of the Apache Camel component which will be used to route messages. (component://address?option1=value1&options2=value2)")
         .define(ADDRESS_CONFIG, Type.STRING, Importance.HIGH, "The address which will be used to configure the component. (component://address?option1=value1&options2=value2)")
         .define(OPTIONS_CONFIG, Type.LIST, Collections.EMPTY_LIST, Importance.HIGH, "List of options for configuring the component. The list should contain key-value pairs. E.g. `[\"option1=key1\", \"option2=key2\"]`.")
-        .define(TOPIC_CONFIG, Type.LIST, Importance.HIGH, "The topic to publish data to");
+        .define(TOPIC_CONFIG, Type.STRING, Importance.HIGH, "The topic to publish data to");
 
     private String connectorName;
     private String component;
@@ -62,7 +62,7 @@ public class CamelSourceConnector extends SourceConnector {
 
     @Override
     public Class<? extends Task> taskClass() {
-        return CamelSinkTask.class;
+        return CamelSourceTask.class;
     }
 
     @Override
